@@ -7,6 +7,12 @@ pub struct MetricFamily {
     pub metrics: Vec<Metric>,
 }
 
+impl MetricFamily {
+    pub fn distill_from(families: impl IntoIterator<Item = prometheus::proto::MetricFamily>) -> Vec<Self> {
+        distill_metric_state(families)
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub enum Metric {
     Counter(Vec<MetricLabel>, Option<f64>),
