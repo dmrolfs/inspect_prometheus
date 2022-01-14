@@ -1,7 +1,7 @@
 use std::convert::Infallible;
 use std::str::FromStr;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct MetricFamily {
     pub name: String,
     pub metrics: Vec<Metric>,
@@ -13,7 +13,7 @@ impl MetricFamily {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Metric {
     Counter(Vec<MetricLabel>, Option<f64>),
     Gauge(Vec<MetricLabel>, Option<f64>),
@@ -26,6 +26,15 @@ pub enum Metric {
 }
 
 impl Metric {
+    pub fn labels(&self) -> Vec<MetricLabel> {
+        match self {
+            Self::Counter(labels, _) => labels.clone(),
+            Self::Gauge(labels, _) => labels.clone(),
+            Self::Histogram { labels, .. } => labels.clone(),
+            Self::UNSUPPORTED(_) => vec![],
+        }
+    }
+
     pub fn count(&self) -> u64 {
         match self {
             Self::Counter(_, _) => 1,
@@ -45,7 +54,7 @@ impl Metric {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct MetricLabel {
     pub name: String,
     pub value: String,
